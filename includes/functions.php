@@ -2050,17 +2050,18 @@ function advert_category_path( $term ) {
  * @return int Number of posts in this cantegory and sub-categories
  */
 function adverts_category_post_count( $term ) {
-    $cat = $term;
-    $count = (int) $cat->count;
-    $taxonomy = 'advert_category';
-    $args = array(
-      'child_of' => $term->term_id,
-    );
-    $tax_terms = get_terms($taxonomy,$args);
-    foreach ($tax_terms as $tax_term) {
-        $count +=$tax_term->count;
-    }
-    
+    $the_query = new WP_Query( array(
+        'post_type' => 'advert',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'advert_category',
+                'field' => 'id',
+                'terms' => $term->term_id,
+            )
+        )
+    ) );
+    $count = $the_query->found_posts;
+
     return apply_filters( "adverts_category_post_count", $count, $term );
 }
 
